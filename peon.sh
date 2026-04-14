@@ -3827,10 +3827,14 @@ if event in _dismiss_events and session_id and cfg.get('notification_stacking', 
             if len(_parts) >= 2:
                 for _kpid in _parts[1].split():
                     try:
-                        os.kill(int(_kpid), 15)
+                        os.kill(int(_kpid), 9)  # SIGKILL — instant dismiss
                     except (OSError, ValueError):
                         pass
             os.unlink(_sf)
+            if len(_parts) >= 1 and _parts[0]:
+                import shutil as _sh
+                try: _sh.rmtree(os.path.join(_slot_dir, 'slot-' + _parts[0]))
+                except Exception: pass
         except Exception:
             pass
 
