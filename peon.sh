@@ -4354,7 +4354,15 @@ print('MSG_SUBTITLE=' + q(msg_subtitle))
 print('DESKTOP_NOTIF=' + ('true' if desktop_notif else 'false'))
 print('NOTIF_STYLE=' + q(cfg.get('notification_style', 'overlay')))
 print('NOTIF_POSITION=' + q(cfg.get('notification_position', 'top-center')))
-print('NOTIF_DISMISS=' + q(str(cfg.get('notification_dismiss_seconds', 4))))
+# Auto-dismiss informational notifications (task.complete, idle) even when global mode is persistent.
+# These don't require user interaction, so keeping them persistent has no value.
+_base_dismiss = cfg.get('notification_dismiss_seconds', 4)
+_auto_dismiss_seconds = cfg.get('notification_auto_dismiss_seconds', 4)
+if _notify_type in ('complete', 'idle') and _base_dismiss == 0:
+    _effective_dismiss = _auto_dismiss_seconds
+else:
+    _effective_dismiss = _base_dismiss
+print('NOTIF_DISMISS=' + q(str(_effective_dismiss)))
 print('NOTIF_ALL_SCREENS=' + ('true' if cfg.get('notification_all_screens', True) else 'false'))
 print('NOTIF_MARKER=' + q(cfg.get('notification_title_marker', '●')))
 print('NOTIF_CLOSE_BUTTON=' + ('true' if cfg.get('notification_close_button', True) else 'false'))
